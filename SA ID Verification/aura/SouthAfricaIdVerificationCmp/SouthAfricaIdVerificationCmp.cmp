@@ -117,7 +117,7 @@
                                 <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                                     <label class="slds-form-element__label" for="single-form-element-id-02">Holiday Name</label>
                                     <div class="slds-form-element__control">
-                                        <p>{!v.holidayDetails.holidayName}</p>
+                                        <p>{!v.holidayDetails.Name}</p>
                                     </div>
                                 </div>
                             </div>
@@ -125,7 +125,7 @@
                                 <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                                     <label class="slds-form-element__label" for="single-form-element-id-03">Holiday Type</label>
                                     <div class="slds-form-element__control">
-                                        <p>{!v.holidayDetails.HolidayType}</p> 
+                                        <p>{!v.holidayDetails.Type__c}</p> 
                                     </div>
                                 </div>
                             </div>
@@ -138,7 +138,7 @@
                                 <div class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_1-col">
                                     <label class="slds-form-element__label" for="single-form-element-id-04">Holiday Description</label>
                                     <div class="slds-form-element__control">
-                                        <textarea id="single-form-element-id-04" class="slds-textarea">{!v.holidayDetails.holidayDescription}</textarea>
+                                        <textarea id="single-form-element-id-04" class="slds-textarea">{!v.holidayDetails.Description__c}</textarea>
                                     </div>
                                 </div>
                             </div>
