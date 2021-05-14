@@ -1,0 +1,157 @@
+<aura:component controller="SouthAfricaIdVerificationController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="err" type="Boolean" default="false" />
+    <aura:attribute name="isButtonActive" type="Boolean" default="true" />
+    <aura:attribute name="idNumber" type="Integer" />
+    <aura:attribute name="holidayDetails" type="Object"/>
+    <aura:attribute name="DOB" type="String"/>
+    <aura:attribute name="SAcitizen" type="String"/>
+    <aura:attribute name="Gender" type="String"/>
+    <aura:attribute name="showDetailsSection" type="Boolean" default="false"/>
+    <aura:attribute name="holidayFound" type="Boolean" default="false"/>
+
+    
+    
+    
+    <!-- Search Box -->
+    
+    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-align_absolute-center">
+        
+        
+        <div class="slds-col slds-size_4-of-6">
+            
+            <div class="slds-card slds-m-bottom_medium">
+                
+                <p class="slds-m-top_x-small slds-align_absolute-center slds-text-heading_small">Check if there
+                    are any important public holidays on your date of birth by entring your ID Number.</p>
+                
+                <div class="slds-p-around_medium">
+                    <lightning:input
+                                     aura:id="id-search"
+                                     name="id-search"
+                                     label="South Africa ID Number"
+                                     onchange="{!c.validateId}"
+                                     type="search"
+                                     />
+                </div> 
+                
+                
+                <aura:if isTrue="{!v.err}">
+                    
+                    <p name ='errorTxt' class="slds-m-around_x-small slds-align_absolute-center">Please Enter Valid ID Number</p>
+                    
+                </aura:if>
+                
+            </div>
+            
+            <lightning:button class = "slds-align_absolute-center"
+                              aura:id="srcBtn"
+                              label="Search"
+                              title="Search"
+                              onclick="{!c.search}"
+                              disabled="{!v.isButtonActive}"/>
+        </div>
+        
+        
+        
+    </div>
+    
+    <!-- Details Section -->
+    
+    
+    <aura:if isTrue="{!v.showDetailsSection}">
+        
+        <div class="slds-grid slds-gutters slds-m-bottom_medium slds-align_absolute-center">
+            
+            
+            <div class="slds-col slds-size_4-of-6">
+               
+                <div class="slds-card">
+                    
+                    <aura:if isTrue="{!v.holidayFound}">
+                        <p class="slds-m-top_x-small slds-align_absolute-center slds-text-color_destructive slds-text-heading_small">No holiday found on your Birth Date</p>
+                    </aura:if>
+                    
+                    <div class="slds-form slds-m-around_small" role="list">
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                    <label class="slds-form-element__label" for="single-form-element-id-02">ID Number</label>
+                                    <div class="slds-form-element__control">
+                                        <p>{!v.idNumber}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                    <label class="slds-form-element__label" for="single-form-element-id-03">Gender</label>
+                                    <div class="slds-form-element__control">
+                                        <p>{!v.Gender}</p> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                    <label class="slds-form-element__label" for="single-form-element-id-02">Date of Birth</label>
+                                    <div class="slds-form-element__control">
+                                        <p>{!v.DOB}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                    <label class="slds-form-element__label" for="single-form-element-id-03">SA Citizen</label>
+                                    <div class="slds-form-element__control">
+                                        <p>{!v.SAcitizen}</p> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                    <label class="slds-form-element__label" for="single-form-element-id-02">Holiday Name</label>
+                                    <div class="slds-form-element__control">
+                                        <p>{!v.holidayDetails.holidayName}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                    <label class="slds-form-element__label" for="single-form-element-id-03">Holiday Type</label>
+                                    <div class="slds-form-element__control">
+                                        <p>{!v.holidayDetails.HolidayType}</p> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_1-col">
+                                    <label class="slds-form-element__label" for="single-form-element-id-04">Holiday Description</label>
+                                    <div class="slds-form-element__control">
+                                        <textarea id="single-form-element-id-04" class="slds-textarea">{!v.holidayDetails.holidayDescription}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+    </aura:if>
+    
+    
+</aura:component>
