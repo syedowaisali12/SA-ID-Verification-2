@@ -37,10 +37,6 @@ public class SouthAfricaIdVerificationController {
             upsert identity ID_Number__c;
             
             
-            //Calling future method to get all holidays related to Birth Year using Calendarific API. 
-            
-            fetchHolidays(DOB,identity.Id);
-            
             
         }catch(DmlException e) {
             
@@ -50,8 +46,8 @@ public class SouthAfricaIdVerificationController {
         return identity.id;
     }
     
-    @future(callout=true)
-    public static void fetchHolidays(date DOB,Id relatedID) {
+    @AuraEnabled
+    public static Holiday__c fetchHolidays(date DOB,Id relatedID) {
         
         
         //Getting API Parameters from Metadata 
@@ -64,13 +60,15 @@ public class SouthAfricaIdVerificationController {
         
         // Calling API only if its a new Identity
         
+        Holiday__c HDay = new Holiday__c();
         List<Holiday__c> existingholiday = [Select Id,Name,Type__c,Description__c,Identity__C,Date__c From
                                             Holiday__c where identity__C =: relatedID];
         
         
+        
         if(existingholiday.size() == 0){
             
-            List<Holiday__c> newHolidayList = new List<Holiday__c>();
+            List<Holiday__c> holidayList = new List<Holiday__c>();
             Integer dobYear = DOB.year();
             
             
@@ -90,7 +88,7 @@ public class SouthAfricaIdVerificationController {
                 
                 List<Object> holidays = (List<Object>) resp.get('holidays');
                 
-               
+                
                 for (Object holiday: holidays) {
                     
                     Map<String, Object> holidayDetails = (Map<String, Object>)holiday;
@@ -110,68 +108,49 @@ public class SouthAfricaIdVerificationController {
                     
                     
                     
-                    newHolidayList.add(new Holiday__c(name = holidayName,
-                                                      Description__c = holidayDescription,
-                                                      Date__c = hDate,
-                                                      Type__c = HolidayType,
-                                                      identity__C = relatedID
-                                                     ));
+                    holidayList.add(new Holiday__c(name = holidayName,
+                                                   Description__c = holidayDescription,
+                                                   Date__c = hDate,
+                                                   Type__c = HolidayType,
+                                                   identity__C = relatedID
+                                                  ));
                     
                 }
                 
                 
-                if(newHolidayList.size() > 0){
-                    insert newHolidayList;  
+                if(holidayList.size() > 0){
+                    insert HolidayList; 
+                    
+                    for(Holiday__c h: holidayList ){
+                        
+                        if(h.date__c == DOB ){
+                            HDay = h;
+                                                        
+                        }
+                    } 
                 }
-                
                 
             }
             
-        }
-       
-    }
-    
-    //Method to get the Holiday Information from the Object and return it to Aura Component.
-    
-    @AuraEnabled
-    public static holidayWrapper getHolidayDetail(Date DOB,String relatedID){
-        
-        system.debug('relatedID:::'+relatedID);
-        List<Holiday__c> holiday = [Select Id,Name,Type__c,Description__c,Identity__C,Date__c From
-                                    Holiday__c where identity__c =: relatedID
-                                    and Date__c =: DOB];
-        
-       system.debug('holiday:::'+holiday);
-
-        if(holiday.size() > 0){
+        }else{
+                        
+            List<Holiday__c> holiday = [Select Id,Name,Type__c,Description__c,Identity__C,Date__c From
+                                        Holiday__c where identity__c =: relatedID
+                                        and Date__c =: DOB];
             
-            return new holidayWrapper(holiday[0].Name,
-                                      holiday[0].Description__c,
-                                      holiday[0].Type__c);
+            if(holiday.size() > 0){
+                
+                
+                if(holiday[0].date__c == DOB ){
+                    HDay = holiday[0];   
+                   
+                }
+            }
         }
         
-        return null;
+        return HDay;
         
     }
-    
-    
-    public class holidayWrapper {
-        
-        @AuraEnabled
-        public string holidayName{get;set;}
-        @AuraEnabled
-        public string holidayDescription{get;set;}
-        @AuraEnabled
-        public string HolidayType{get;set;}
-        
-        holidayWrapper(String holidayName, String holidayDescription, String HolidayType){
-            
-            this.holidayName = holidayName;
-            this.holidayDescription = holidayDescription;
-            this.HolidayType = HolidayType;
-        }
-        
-        
-    }
+   
     
 }
